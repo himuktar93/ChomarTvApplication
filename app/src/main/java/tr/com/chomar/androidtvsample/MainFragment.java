@@ -14,6 +14,7 @@
 
 package tr.com.chomar.androidtvsample;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Timer;
@@ -56,8 +57,8 @@ public class MainFragment extends BrowseFragment {
     private static final int BACKGROUND_UPDATE_DELAY = 300;
     private static final int GRID_ITEM_WIDTH = 200;
     private static final int GRID_ITEM_HEIGHT = 200;
-    private static final int NUM_ROWS = 6;
-    private static final int NUM_COLS = 15;
+    private static final int NUM_ROWS = 3;
+    private static final int NUM_COLS = 2;
 
     private final Handler mHandler = new Handler();
     private ArrayObjectAdapter mRowsAdapter;
@@ -91,25 +92,58 @@ public class MainFragment extends BrowseFragment {
     }
 
     private void loadRows() {
-        List<Movie> list = MovieList.setupMovies();
+        String headers [] = {
+                "HOME",
+                "ARAÇLAR",
+                "AYARLAR"
+        };
+
+        List<String> homeItems = new ArrayList<>();
+        homeItems.add("TARAMA");
+        homeItems.add("GÜNCELLEME");
+
+        List<String> toolsItems = new ArrayList<>();
+        toolsItems.add("DOSYAYI ANALİZ İÇİN GÖNDER");
+        toolsItems.add("GÜNLÜK DOSYALARI");
+        toolsItems.add("KARANTİNA");
+        toolsItems.add("TARAMA DIŞINDA KALAN ÖGELER");
+
+        List<String> settingsItems = new ArrayList<>();
+        settingsItems.add("GENEL AYARLAR");
+        settingsItems.add("AKTİF KORUMA");
+        settingsItems.add("VİRUS TARAMASI");
 
         mRowsAdapter = new ArrayObjectAdapter(new ListRowPresenter());
         CardPresenter cardPresenter = new CardPresenter();
-
         int i;
+
+        GridItemPresenter gridPresenter = new GridItemPresenter();
+
         for (i = 0; i < NUM_ROWS; i++) {
-            if (i != 0) {
-                Collections.shuffle(list);
+            ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(gridPresenter);
+
+            switch (i){
+                case 0:
+                    for (int j = 0; j < homeItems.size(); j++) {
+                        listRowAdapter.add(homeItems.get(j));
+                    }
+                    break;
+                case 1:
+                    for (int j = 0; j < toolsItems.size(); j++) {
+                        listRowAdapter.add(toolsItems.get(j));
+                    }
+                    break;
+                case 2:
+                    for (int j = 0; j < settingsItems.size(); j++) {
+                        listRowAdapter.add(settingsItems.get(j));
+                    }
+                    break;
             }
-            ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
-            for (int j = 0; j < NUM_COLS; j++) {
-                listRowAdapter.add(list.get(j % 5));
-            }
-            HeaderItem header = new HeaderItem(i, MovieList.MOVIE_CATEGORY[i]);
+            HeaderItem header = new HeaderItem(i, headers[i]);
             mRowsAdapter.add(new ListRow(header, listRowAdapter));
         }
 
-        HeaderItem gridHeader = new HeaderItem(i, "PREFERENCES");
+        HeaderItem gridHeader = new HeaderItem(3, "PREFERENCES");
 
         GridItemPresenter mGridPresenter = new GridItemPresenter();
         ArrayObjectAdapter gridRowAdapter = new ArrayObjectAdapter(mGridPresenter);
@@ -145,15 +179,6 @@ public class MainFragment extends BrowseFragment {
     }
 
     private void setupEventListeners() {
-        setOnSearchClickedListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(getActivity(), "Implement your own in-app search", Toast.LENGTH_LONG)
-                        .show();
-            }
-        });
-
         setOnItemViewClickedListener(new ItemViewClickedListener());
         setOnItemViewSelectedListener(new ItemViewSelectedListener());
     }
